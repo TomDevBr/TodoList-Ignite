@@ -1,17 +1,16 @@
-import { useState } from "react";
-import { v4  } from 'uuid'
+
 import style from "./Task.module.scss";
-interface ITasks {
-  title: string[];
+export interface ITasks {
+  title: string;
   id: string;
   isChecked: boolean;
-  onCheckTask(): void;
+  onCheckTask: (id: string) => void;
 }
 
 export default function Task({ title, id, isChecked, onCheckTask }: ITasks) {
 
     function checkTask() {
-        onCheckTask();
+        onCheckTask(id);
     }
   return (
     <>

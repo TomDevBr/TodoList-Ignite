@@ -2,63 +2,73 @@ import Header from "./components/Header/Header";
 import { v4 } from "uuid";
 import style from "./App.module.scss";
 import Task from "./components/Task/Task";
-import React, { ChangeEventHandler, FormEvent, FormEventHandler, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 
-
-const tasks = [
-  {
-    id: v4(),
-    title: ["primeira task"],
-    isCompleted: true,
-  },
-  {
-    id: v4(),
-    title: ["segunda task"],
-    isCompleted: false,
-  },
-  {
-    id: v4(),
-    title: ["terceira task"],
-    isCompleted: true,
-  },
-]
-
+interface ITasks {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+}
 
 function App() {
-  const [ tasksCompleteds, setTasksCompleteds] = useState(0)
-  const [ onCheck, setOnCheck] = useState(false)
-  const [ titleTask, setTitleTask] = useState(['escreva sua primeira task'])
-  const [ taskCreated, setTaskCreated ] = useState("")
+  const [task, setTask] = useState<ITasks[]>([{
+    id: v4(),
+    title: "crie sua primeira task",
+    isCompleted: false,}
+  ]);
+  const [newTitle, setNewTitle] = useState<string>("");
+  const [onCheck, setOnCheck] = useState(false);
+  const [ tasksCompleteds, setTasksCompleteds] = useState<number>()
 
-  function createNewTask ( event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setTitleTask([...titleTask, taskCreated])
+  function createNewTask(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const newTask = {
-      id: v4(),
-      title: titleTask,
-      isCompleted: onCheck,
-    }
+    if (!newTitle) return alert("É necessario adicionar um titulo da tarefa");
+
+    setTask((oldState) => [
+      ...oldState,
+      {
+        id: v4(),
+        title: newTitle,
+        isCompleted: onCheck,
+      },
+    ]);
+    setNewTitle("");
+  }
+
+  function handleNewTaskText(event: React.ChangeEvent<HTMLInputElement>) {
+    setNewTitle(event.target.value);
+  }
+
+  const numberOfTasksCompleteds = task.reduce((acc ,taskActual) => {
+    taskActual.isCompleted? acc += 1 : acc += 0;
+    
+    return acc;
+  }, 0)
+
+
+
+
+  function taskChecked(id: string) {
+    setTasksCompleteds(numberOfTasksCompleteds)
+
+    setTask((oldState) => {
+      const newValue = oldState.map((task)=> {
+        if(task.id === id) {
+          return { ...task, isCompleted: !task.isCompleted}
+        }
+        return task;
+      });
+      return newValue
+    })
+  }
+
+  console.log(tasksCompleteds)
+
   
-    tasks.push(newTask)
 
-  }
-
-
-
-
-  function handleNewTaskText ( event: React.ChangeEvent<HTMLInputElement>) {
-    setTaskCreated(event.target.value)
-
-   
-  }
-
- 
-
-  function taskChecked() {
-    setOnCheck(true)
-  }
-  console.log(tasks)
+  console.log(numberOfTasksCompleteds)
+  console.log(onCheck)
 
 
   return (
@@ -67,31 +77,51 @@ function App() {
         <Header />
         <div className={style.appGrid}>
           <form onSubmit={createNewTask} className={style.inputContainer}>
-          <label htmlFor="input">
-            <input type="text" onChange={handleNewTaskText} name="input"  placeholder="adicione uma nova tarefa" />
-          </label>
-          <button type="submit">Criar <img src="src/assets/plus.svg" alt="plus" /></button>
+            <label htmlFor="input">
+              <input
+                type="text"
+                onChange={handleNewTaskText}
+                name="input"
+                value={newTitle}
+                placeholder="adicione uma nova tarefa"
+              />
+            </label>
+            <button type="submit">
+              Criar <img src="src/assets/plus.svg" alt="plus" />
+            </button>
           </form>
-        <section className={style.listContainer}>
-          <div className={style.listHeader}>
-            <p className={style.tasksCreateds}>Taterafas criadas <div className={style.count}>0</div></p> 
-            <p className={style.tasksCompleteds}>Concluidas <div className={style.count}>{tasksCompleteds}</div></p>    
-          </div>
-          <div className={style.listTasks}>
-              {/* <img src="src/assets/Clipboard.svg" alt="clipboard" />
-              <h2 className={style.firstLineText}>Você ainda não tem tarefas cadastradas</h2>
-              <h2>Crie tarefas e organize seus itens a fazer</h2> */}
-
-              {
-                tasks.map( task => { 
-                  return(
-                    <Task  title={task.title} id={task.id} isChecked={task.isCompleted} onCheckTask={taskChecked}   />
-                  )
+          <section className={style.listContainer}>
+            <div className={style.listHeader}>  
+              <p className={style.tasksCreateds}>
+                Taterafas criadas <div className={style.count}>0</div>
+              </p>
+            <p className={style.tasksCompleteds}>Concluidas<div className={style.count}>{numberOfTasksCompleteds}</div>
+              </p>
+            </div>
+            <div className={style.listTasks}>
+              {task.length <= 0   ? (
+                <>
+                  <img src="src/assets/Clipboard.svg" alt="clipboard" />
+                  <h2 className={style.firstLineText}>
+                    Você ainda não tem tarefas cadastradas
+                  </h2>
+                  <h2>Crie tarefas e organize seus itens a fazer</h2>
+                </>
+              ) : (
+                task.map((task) => {
+                  return (
+                    <Task
+                      key={task.id}
+                      title={task.title}
+                      id={task.id}
+                      isChecked={task.isCompleted}
+                      onCheckTask={taskChecked}
+                    />
+                  );
                 })
-              }
-            
-          </div>
-        </section>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </>
