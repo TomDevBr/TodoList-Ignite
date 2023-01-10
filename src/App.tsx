@@ -2,7 +2,7 @@ import Header from "./components/Header/Header";
 import { v4 } from "uuid";
 import style from "./App.module.scss";
 import Task from "./components/Task/Task";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface ITasks {
   id: string;
@@ -11,14 +11,11 @@ interface ITasks {
 }
 
 function App() {
-  const [task, setTask] = useState<ITasks[]>([{
-    id: v4(),
-    title: "crie sua primeira task",
-    isCompleted: false,}
-  ]);
+  const [task, setTask] = useState<ITasks[]>([]);
   const [newTitle, setNewTitle] = useState<string>("");
-  const [onCheck, setOnCheck] = useState(false);
-  const [ tasksCompleteds, setTasksCompleteds] = useState<number>()
+  const [numberOfTaskCreateds, setNumberOfTaskCreateds] = useState<number>(0)
+  const [ tasksCompleteds, setTasksCompleteds] = useState<number>(0)
+
 
   function createNewTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,7 +27,7 @@ function App() {
       {
         id: v4(),
         title: newTitle,
-        isCompleted: onCheck,
+        isCompleted: false,
       },
     ]);
     setNewTitle("");
@@ -40,18 +37,29 @@ function App() {
     setNewTitle(event.target.value);
   }
 
-  const numberOfTasksCompleteds = task.reduce((acc ,taskActual) => {
-    taskActual.isCompleted? acc += 1 : acc += 0;
-    
-    return acc;
-  }, 0)
+  useEffect(() => {
+    const countTasksCompleteds = task.reduce((acc ,taskActual) => {
+      taskActual.isCompleted ? acc += 1 : acc += 0;
+      
+      return acc;
+    }, 0);
 
+    setTasksCompleteds(countTasksCompleteds);
+  }, [task]) 
+
+  useEffect (() => {
+    const countTasksCreateds = task.reduce((acc , taskAtual) => {
+      taskAtual.id ? acc += 1 : acc += 0;
+
+      return acc
+    },0)
+
+    setNumberOfTaskCreateds(countTasksCreateds)
+  }, [task])
 
 
 
   function taskChecked(id: string) {
-    setTasksCompleteds(numberOfTasksCompleteds)
-
     setTask((oldState) => {
       const newValue = oldState.map((task)=> {
         if(task.id === id) {
@@ -63,12 +71,12 @@ function App() {
     })
   }
 
-  console.log(tasksCompleteds)
+  function deleteTask(id: string) {
+    setTask((oldState) => {
+      return oldState.filter((task) => task.id !== id);
+    })
+  }
 
-  
-
-  console.log(numberOfTasksCompleteds)
-  console.log(onCheck)
 
 
   return (
@@ -93,11 +101,11 @@ function App() {
           <section className={style.listContainer}>
             <div className={style.listHeader}>  
               <p className={style.tasksCreateds}>
-                Taterafas criadas <div className={style.count}>0</div>
+                Taterafas criadas <div className={style.count}>{numberOfTaskCreateds}</div>
               </p>
-            <p className={style.tasksCompleteds}>Concluidas<div className={style.count}>{numberOfTasksCompleteds}</div>
+            <p className={style.tasksCompleteds}>Concluidas<div className={style.count}>{`${tasksCompleteds} de ${numberOfTaskCreateds}`}</div>
               </p>
-            </div>
+            </div>  
             <div className={style.listTasks}>
               {task.length <= 0   ? (
                 <>
@@ -115,8 +123,8 @@ function App() {
                       title={task.title}
                       id={task.id}
                       isChecked={task.isCompleted}
-                      onCheckTask={taskChecked}
-                    />
+                      onCheckTask={taskChecked} 
+                      onDeleteTask={deleteTask}                    />
                   );
                 })
               )}

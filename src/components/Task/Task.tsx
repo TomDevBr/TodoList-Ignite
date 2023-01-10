@@ -5,12 +5,17 @@ export interface ITasks {
   id: string;
   isChecked: boolean;
   onCheckTask: (id: string) => void;
+  onDeleteTask : (id: string) => void;
 }
 
-export default function Task({ title, id, isChecked, onCheckTask }: ITasks) {
+export default function Task({ title, id, isChecked, onCheckTask, onDeleteTask }: ITasks) {
 
     function checkTask() {
-        onCheckTask(id);
+      onCheckTask(id);
+    }
+
+    function deleteTask() {
+      onDeleteTask(id);
     }
   return (
     <>
@@ -21,7 +26,7 @@ export default function Task({ title, id, isChecked, onCheckTask }: ITasks) {
             <p>{title}</p>
           </label>
         </div>
-        <img src="src/assets/delete.svg" alt="delete" />
+        <img onClick={deleteTask} src="src/assets/delete.svg" alt="delete" />
       </div>
     </>
   );

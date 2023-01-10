@@ -58,8 +58,14 @@
         padding: 1px;     
     }
 
+    .customCheckbox input:checked + label > p{
+        text-decoration: line-through;
+        color: var(--gray-300);
+    }
+
     img {
         width: 0.78rem;
+        cursor: pointer;
         
 
     }
