@@ -5,10 +5,7 @@ Projeto desenvolvido para completar o primeiro desafio do ignite da RocketSeat.
 
  
 # Tecnologias utilizadas
-HTML 
-CSS
-TypeScript
-React
+HTML / CSS / TypeScript / React
 
 Pré-requisitos: 
 Node
