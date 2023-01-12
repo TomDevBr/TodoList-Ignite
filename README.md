@@ -1,4 +1,4 @@
-# Ignite-Feed
+# TodoList-Ignite
 
 Projeto desenvolvido para completar o primeiro desafio do ignite da RocketSeat.
 
